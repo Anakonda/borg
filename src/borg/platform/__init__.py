@@ -40,3 +40,4 @@ elif sys.platform == 'win32':  # pragma: windows only
     from .windows import select
     from .windows import get_process_id
     from .windows import process_alive
+    from .windows import absolute_path

@@ -79,7 +79,7 @@ from .upgrader import AtticRepositoryUpgrader, BorgRepositoryUpgrader
 
 if sys.platform == 'win32':
     import posixpath
-    from .platform import get_ads
+    from .platform import get_ads, absolute_path
 
 
 STATS_HEADER = "                       Original size      Compressed size    Deduplicated size"
@@ -469,7 +469,8 @@ class Archiver:
                     self.print_file_status(status, path)
                     continue
                 if sys.platform == 'win32':
-                    path = posixpath.normpath(path.replace('\\', '/'))
+                    # path = posixpath.normpath(path.replace('\\', '/'))
+                    path = os.path.normpath(path)
                 else:
                     path = os.path.normpath(path)
                 try:
@@ -544,6 +545,8 @@ class Archiver:
 
         This should only raise on critical errors. Per-item errors must be handled within this method.
         """
+        if sys.platform == 'win32':
+            path = absolute_path(path)
         try:
             recurse_excluded_dir = False
             if matcher.match(path):
@@ -603,7 +606,8 @@ class Archiver:
                         if sys.platform != 'win32':
                             normpath = os.path.normpath(dirent.path)
                         else:
-                            normpath = posixpath.normpath(dirent.path.replace('\\', '/'))
+                            # normpath = posixpath.normpath(dirent.path.replace('\\', '/'))
+                            normpath = os.path.normpath(dirent.path)
                         self._process(fso, cache, matcher, exclude_caches, exclude_if_present,
                                       keep_exclude_tags, skip_inodes, normpath, restrict_dev,
                                       read_special=read_special, dry_run=dry_run)

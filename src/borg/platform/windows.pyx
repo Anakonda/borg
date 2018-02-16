@@ -363,9 +363,9 @@ def acl_get(path, item, st, numeric_owner=False, depth = 0):
         enable_permissions()
     pyDACL = []
     pySACL = []
-    if not os.path.samefile(os.path.abspath(path), os.path.abspath(os.path.join(path, ".."))):
-        pyDACL, pySACL = acl_get(os.path.abspath(os.path.join(path, "..")), item, st, numeric_owner, depth + 1)
-
+    if not os.path.samefile(os.path.abspath(path), os.path.splitdrive(path)[0] + '\\'):
+        pyDACL, pySACL = acl_get(os.path.abspath(os.path.join(path, "..")) + '\\', item, st, numeric_owner, depth + 1)
+        
     cdef int request = DACL_SECURITY_INFORMATION
     if permissions_granted:
         request = DACL_SECURITY_INFORMATION | SACL_SECURITY_INFORMATION
@@ -582,5 +582,8 @@ def process_alive(host, pid, thread):
     if host.lower() != platform.node().lower():
         return True
     return (OpenProcess(PROCESS_QUERY_INFORMATION, False, pid) != NULL)
-        
-    
+
+def absolute_path(path):
+    if path[0:len('\\\\?\\')] != '\\\\?\\':
+        path = '\\\\?\\' + os.path.abspath(path)
+    return path
