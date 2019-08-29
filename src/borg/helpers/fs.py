@@ -123,11 +123,17 @@ def dir_is_tagged(path, exclude_caches, exclude_if_present):
 
 
 _safe_re = re.compile(r'^((\.\.)?/+)+')
+_win_abspath_re = re.compile(r'^(?:\\\\\?\\)?[a-zA-Z]:(?P<path>.+)')
 
 
 def make_path_safe(path):
     """Make path safe by making it relative and local
     """
+    if sys.platform == 'win32':
+        match = _win_abspath_re.match(path)
+        if match is not None:
+            path = match.group('path')
+        path = path.replace('\\', '/')
     return _safe_re.sub('', path) or '.'
 
 
